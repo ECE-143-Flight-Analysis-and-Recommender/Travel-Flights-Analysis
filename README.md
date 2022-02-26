@@ -9,7 +9,7 @@
 ## Authors
 
 * **Gordan Duncan** - [Rusalani](https://github.com/Rusalani)
-* **Hao Yu** [caffreyu](https://github.com/caffreyu)
+* **Hao Yu** - [caffreyu](https://github.com/caffreyu)
 * **Sri Shatagopam** - [srishatagopam](https://github.com/srishatagopam)
 * **Yuqi Su** - [sysu17364057](https://github.com/sysu17364057)
 * **Haoliang Wei** - [wedogg](https://github.com/wedogg)
