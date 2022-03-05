@@ -1,10 +1,51 @@
 # Group 0 - Exploratory Analalysis on Flight Data
 
+### Project Description
+
+On Jan 1st, 1914, the very first scheduled passenger airplane took off from St. Petersburg and landed safely in Tampa. Even though the service of this airline only lasted four months, it still paved the way for forming the modern way of traveling by air. Despite how people love this efficient transportation service, it is common to observe lots of vacant seats in a regularly scheduled flight, and it is also common to get into trouble purchasing a single ticket because of lack of available seats. These situations are usually assumed to have close relations to high season and low season of traveling. However, in 2020, quarantine orders forced people to stay at home, hence the COVID-19 pandemic had a critical hit on the airline industry. The purpose of this project is to investigate data of airlines dated from July 2005 to June 2021 to find out the impacts of different seasons and the pandemic on the airline industry. We are particularly interested in analyzing the trendings of traveling based on the dataset we found, making suggestions to airline companies on modifying the arrangement of flights, and recommending travel programs to potential passengers. We are also attentive to finding out how much the industry had recovered in the first half of the year in 2021.
+
+
+### Dataset
+
+The dataset we used to analyze can be found on [Kaggle](https://www.kaggle.com/usdot/flight-delays).
+
+
 ### File Structure
 
+
 ### How to run your code
+Please download/import all [third-party modules](https://github.com/kencasimiro/Travel-Flights-Analysis/blob/main/README.md#name-all-third-party-modules) before executing the code.
+All code can be run through terminal/command-line by doing the following:
+```
+python3 <file.py>
+```
 
 ### Name all third-party modules
+
+All third-party modules can be downloadec through the following methods:
+
+[Conda](https://docs.conda.io/en/latest/):
+```
+conda install <third-party module>
+```
+
+[Pip](https://pypi.org/project/pip/):
+```
+pip install <third-party module>
+```
+
+[Homebrew](https://brew.sh/):
+```
+brew install <third-party module>
+```
+
+* **[Pandas](https://pandas.pydata.org/)**
+* **[NumPy](https://numpy.org/)**
+* **[Matplotlib](https://matplotlib.org/)**
+* **[Seaborn](https://seaborn.pydata.org/)**
+* **[Plotly](https://plotly.com/)**
+* **[Geopandas](https://geopandas.org/en/stable/)**
+* **[Sklearn](https://scikit-learn.org/stable/)**
 
 ## Authors
 
