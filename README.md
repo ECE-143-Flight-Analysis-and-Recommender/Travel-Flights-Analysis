@@ -1,18 +1,27 @@
 # Group 0 - Exploratory Analalysis on Flight Data
 
+### Project Description
+
+
+
 ### File Structure
 
 ### How to run your code
+Please download/import all third-party modules before executing the code.
+All code can be run through terminal/command-line by doing the following:
+```
+python3 <file.py>
+```
 
 ### Name all third-party modules
 
-* **Pandas**
-* **NumPy**
-* **Matplotlib**
-* **Seaborn**
-* **Plotly**
-* **Geopandas**
-* **Sklearn**
+* **[Pandas](https://pandas.pydata.org/)**
+* **[NumPy](https://numpy.org/)**
+* **[Matplotlib](https://matplotlib.org/)**
+* **[Seaborn](https://seaborn.pydata.org/)**
+* **[Plotly](https://plotly.com/)**
+* **[Geopandas](https://geopandas.org/en/stable/)**
+* **[Sklearn](https://scikit-learn.org/stable/)**
 
 ## Authors
 
