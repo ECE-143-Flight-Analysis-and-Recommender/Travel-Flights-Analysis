@@ -15,6 +15,23 @@ python3 <file.py>
 
 ### Name all third-party modules
 
+All third-party modules can be downloadec through the following methods:
+
+[Conda](https://docs.conda.io/en/latest/):
+```
+conda install <third-party module>
+```
+
+[Pip](https://pypi.org/project/pip/):
+```
+pip install <third-party module>
+```
+
+[Homebrew](https://brew.sh/):
+```
+brew install <third-party module>
+```
+
 * **[Pandas](https://pandas.pydata.org/)**
 * **[NumPy](https://numpy.org/)**
 * **[Matplotlib](https://matplotlib.org/)**
