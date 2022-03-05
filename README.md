@@ -7,7 +7,7 @@
 ### File Structure
 
 ### How to run your code
-Please download/import all third-party modules before executing the code.
+Please download/import all [third-party modules](https://github.com/kencasimiro/Travel-Flights-Analysis/blob/main/README.md#name-all-third-party-modules) before executing the code.
 All code can be run through terminal/command-line by doing the following:
 ```
 python3 <file.py>
