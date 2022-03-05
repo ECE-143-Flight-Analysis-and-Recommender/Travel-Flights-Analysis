@@ -11,6 +11,18 @@ The dataset we used to analyze can be found on [Kaggle](https://www.kaggle.com/u
 
 
 ### File Structure
+```
+Root:
+├───ML Model
+│    Hao_ML.py
+├───Visualizations
+│    Haoliang_Visualizations.py
+│    Sri_Visualizations.py
+│    Yuqi_Visualizations.py
+Presentation_Slides.pdf
+Presentation_Visuals.ipynb
+README.md
+```
 
 
 ### How to run your code
