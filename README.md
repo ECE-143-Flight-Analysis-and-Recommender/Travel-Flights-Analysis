@@ -6,6 +6,14 @@
 
 ### Name all third-party modules
 
+* **Pandas**
+* **NumPy**
+* **Matplotlib**
+* **Seaborn**
+* **Plotly**
+* **Geopandas**
+* **Sklearn**
+
 ## Authors
 
 * **Gordan Duncan** - [Rusalani](https://github.com/Rusalani)
