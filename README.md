@@ -26,7 +26,7 @@ README.md
 
 
 ### Running The Code
-Please download/import all [third-party modules](https://github.com/kencasimiro/Travel-Flights-Analysis/blob/main/README.md#name-all-third-party-modules) and the dataset from [Kaggle](https://github.com/ECE-143-Flight-Analysis-and-Recommender/Travel-Flights-Analysis#dataset) before executing the code.
+Please download/import all [third-party modules](https://github.com/kencasimiro/Travel-Flights-Analysis/blob/main/README.md#name-all-third-party-modules) and the dataset from [Kaggle](https://www.kaggle.com/usdot/flight-delays) before executing the code.
 All code can be run through terminal/command-line by doing the following:
 ```
 python3 <file.py>
