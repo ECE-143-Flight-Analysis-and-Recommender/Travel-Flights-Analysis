@@ -1,4 +1,4 @@
-# Group 0 - Exploratory Analalysis on Flight Data
+# Group 0 - Trends Contributing to Flight Delays
 
 ### Project Description
 
