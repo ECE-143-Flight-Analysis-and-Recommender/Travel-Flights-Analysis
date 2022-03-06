@@ -6,113 +6,158 @@ from sklearn import metrics, linear_model
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, cross_val_score, cross_val_predict
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from matplotlib.colors import LinearSegmentedColormap
 
-# Load data
+# Load data and pre-processing
 df = pd.read_csv('flights.csv', low_memory = False)
-
-# Combine AIRLINE AND FLIGHT_NUMBER to a string, call it AIR_ROUTE
 df['AIR_ROUTE'] = df['AIRLINE'] + df['FLIGHT_NUMBER'].astype(str)
-
-# Convert YEAR, MONTH, DAY, DAY_OF_WEEK to datetime type, call it DATE
 df['DATE'] = pd.to_datetime(df[['YEAR', 'MONTH', 'DAY']])
-
-# Print out name of features/columns
-print ('There are {} features available in this dataset, which are: '.format(df.shape[1]))
-
-for col in df.columns: print (col)
-
-# Fill nan in columns
-data = df[:]
-data = data[0 : 1000000]
+data = df[0 : 1000000]
 data = data.fillna(data.mean(numeric_only=True))
+data_fd = data[data['CANCELLED'] == 0]
+data_fd = data_fd.drop(['CANCELLED'], axis = 1)
 
-# Filter data based on cancellation status
-data_f = data[data['CANCELLED'] == 0]
-data_f = data_f.drop(['CANCELLED'], axis = 1)
-
-# Convert object type to catergorical type in pandas
-data_f.loc[:, 'ORIGIN_AIRPORT'] = data_f['ORIGIN_AIRPORT'].astype('category').cat.codes
-data_f.loc[:, 'DESTINATION_AIRPORT'] = data_f['DESTINATION_AIRPORT'].astype('category').cat.codes
-data_f.loc[:, 'AIR_ROUTE'] = data_f['AIR_ROUTE'].astype('category').cat.codes
-data_f.loc[:, 'DATE'] = data_f['DATE'].astype('category').cat.codes
+data_fd.loc[:, 'ORIGIN_AIRPORT'] = data_fd['ORIGIN_AIRPORT'].astype('category').cat.codes
+data_fd.loc[:, 'DESTINATION_AIRPORT'] = data_fd['DESTINATION_AIRPORT'].astype('category').cat.codes
+data_fd.loc[:, 'AIR_ROUTE'] = data_fd['AIR_ROUTE'].astype('category').cat.codes
+data_fd.loc[:, 'DATE'] = data_fd['DATE'].astype('category').cat.codes
 
 # Add DELAY to dataframe
-DELAY = np.zeros_like(data_f['ARRIVAL_DELAY'])
-DELAY[data_f['ARRIVAL_DELAY'] > 0] = 1
-data_f.loc[:, 'DELAY'] = DELAY
+# NO DELAY : 0
+# DELAY : 1
+DELAY = np.zeros_like(data_fd['ARRIVAL_DELAY'])
+DELAY[data_fd['ARRIVAL_DELAY'] > 0] = 1
+data_fd.loc[:, 'DELAY'] = DELAY
 
-data_f.corr()
+# # Add DELAY_TIME to dataframe
+# NO DELAY : 0
+# DELAY 0 - 15 MIN: 1
+# DELAY 15 - 30 MIN: 2
+# DELAY 30 - 45 MIN: 3
+# DELAY 45 - 60 MIN: 4
+# DELAY > 60 MIN: 5
+DELAY_TIME = np.zeros_like(data_fd['ARRIVAL_DELAY'])
+DELAY_TIME[np.logical_and(data_fd['ARRIVAL_DELAY'] <= 15, data_fd['ARRIVAL_DELAY'] > 0)] = 1
+DELAY_TIME[np.logical_and(data_fd['ARRIVAL_DELAY'] <= 30, data_fd['ARRIVAL_DELAY'] > 15)] = 2
+DELAY_TIME[np.logical_and(data_fd['ARRIVAL_DELAY'] <= 45, data_fd['ARRIVAL_DELAY'] > 30)] = 3
+DELAY_TIME[np.logical_and(data_fd['ARRIVAL_DELAY'] <= 60, data_fd['ARRIVAL_DELAY'] > 45)] = 4
+DELAY_TIME[data_fd['ARRIVAL_DELAY'] > 60] = 5
+data_fd.loc[:, 'DELAY_TIME'] = DELAY_TIME
 
-data_f.info()
-
-# Find columns with insufficiant valuable info
-# for col in df.columns:
-#     null_sum = df[col].isnull().sum()
-#     null_per = null_sum * 100 / df.shape[0]
-#     if null_per == 0: continue
-#     # print ('{} column has {} percentage of nan values'.format(col, null_per))
-#     if null_per > 80: drop_col.append(col)
-
-# print (drop_col)
-
+# Manually drop unrelated features
 drop_col = []
-
-# Manually select unrelevant columns
-drop_col += ['DISTANCE','TAIL_NUMBER','TAXI_OUT','SCHEDULED_TIME','WHEELS_OFF',\
+drop_col += ['TAIL_NUMBER','TAXI_OUT','WHEELS_OFF',\
              'WHEELS_ON','TAXI_IN','CANCELLATION_REASON','ARRIVAL_TIME', \
              'DIVERTED','MONTH','YEAR','DAY','DAY_OF_WEEK', \
-             'AIRLINE', 'FLIGHT_NUMBER']
+             'AIRLINE', 'FLIGHT_NUMBER', 'ELAPSED_TIME', \
+             'DEPARTURE_TIME', 'DEPARTURE_DELAY', 'ARRIVAL_DELAY', \
+             'AIR_SYSTEM_DELAY', 'SECURITY_DELAY', 'AIRLINE_DELAY', 'LATE_AIRCRAFT_DELAY', 'WEATHER_DELAY']
+data_f = data_fd.drop(list(set(drop_col)), axis = 1)
 
-data_f = data_f.drop(list(set(drop_col)), axis = 1)
+colors = [(135/255, 206/255, 250/255), (1, 160/255, 122/255)]
+color_map = LinearSegmentedColormap.from_list('blue2salmon', colors, N=10)
+font = {'family' : 'DejaVu Sans', 'weight' : 'bold', 'size' : 22}
+plt.rc('font', **font)
 
-data_f.info()
+def getCorrelationMat(df):
 
-# drop_col += ['DISTANCE','TAIL_NUMBER','TAXI_OUT','SCHEDULED_TIME','DEPARTURE_TIME','WHEELS_OFF',\
-#              'ELAPSED_TIME','AIR_TIME','WHEELS_ON','TAXI_IN','CANCELLATION_REASON','ARRIVAL_TIME', \
-#              'SCHEDULED_ARRIVAL','DIVERTED','MONTH','YEAR','DAY','DAY_OF_WEEK', \
-#              'AIRLINE', 'FLIGHT_NUMBER']
+    '''
+    Get the correlation matrix between selected features
+    :param: df
+    :type: panda.DataFrame
+    '''
 
-f = plt.figure(figsize = (15, 15))
-plt.matshow(data_f.corr(), fignum = f.number)
-plt.xticks(np.arange(data_f.shape[1]) + 0.25, data_f.columns, fontsize=10, rotation=45)
-plt.yticks(np.arange(data_f.shape[1]) + 0.1, data_f.columns, fontsize=10)
-cb = plt.colorbar()
-cb.ax.tick_params(labelsize = 12)
-plt.title('Correlation Matrix of Selected Features', fontsize = 12, y = -0.1)
-plt.show()
+    assert isinstance(df, pd.DataFrame), 'INVALID INPUT TYPE'
 
-# Get the data for building the model
-# data_fml = data_f[['ORIGIN_AIRPORT', 'DESTINATION_AIRPORT', 'SCHEDULED_DEPARTURE', 'DEPARTURE_TIME', \
-#                    'SCHEDULED_ARRIVAL', 'DATE', 'DELAY']]
+    data_f = df
+    f = plt.figure(figsize = (12, 12))
+    plt.matshow(data_f.corr(), fignum = f.number, cmap = color_map)
+    plt.xticks(np.arange(data_f.shape[1]) + 0.1, data_f.columns, fontsize=10, rotation=45, color = '#FEF4E8')
+    plt.yticks(np.arange(data_f.shape[1]) + 0.1, data_f.columns, fontsize=10, color = '#FEF4E8')
+    cb = plt.colorbar()
+    cb.ax.tick_params(labelsize = 12, color = '#FEF4E8')
+    cbytick_obj = plt.getp(cb.ax.axes, 'yticklabels')
+    plt.setp(cbytick_obj, color='#FEF4E8')
+    plt.title('Correlation Matrix of Selected Features', fontsize = 28, fontweight='bold', y = -0.1, color = '#FEF4E8')
+    plt.savefig('corr_mat.png', bbox_inches = 'tight')
+    plt.show()
 
-# data_fml = data_f[['ORIGIN_AIRPORT', 'DESTINATION_AIRPORT', 'SCHEDULED_DEPARTURE', 'DEPARTURE_TIME', \
-#                    'SCHEDULED_ARRIVAL', 'DATE', 'AIR_ROUTE', 'DELAY']]
+getCorrelationMat(data_f)
 
-data_fml = data_f.drop(['ARRIVAL_DELAY'], axis = 1)
+def getConfusionMat(model, model_name, X, y, classes):
 
-data_fml.info()
+    '''
+    Display the confusion matrix of applying a classification model on the dataset, and print the accuracy rate
+    :param: model
+    :type: sklearn.tree._classes
+    :param: model_name
+    :type: str
+    :param: X
+    :type: numpy.ndarray
+    :param: y
+    :type: numpy.ndarray
+    :param: classes
+    :type: list
+    '''
 
-data_ml = data_fml.values
-X, y = data_ml[:,:-1], data_ml[:,-1]
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
+    assert isinstance(X, np.ndarray) and isinstance(y, np.ndarray) \
+    and isinstance(model_name, str) and isinstance(classes, list), 'INVALID INPUT TYPE'
+    assert X.shape[0] == y.shape[0] and y.shape[0] == np.size(y), 'INVALID INPUT SHAPE'
+    for ele in classes: assert isinstance(ele, str), 'INVALID INPUT VALUE'
 
-# Decision Tree
-scaled_features = StandardScaler().fit_transform(X_train, X_test)
-clf = DecisionTreeClassifier()
-clf = clf.fit(X_train,y_train)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
+    scaled_features = StandardScaler().fit_transform(X_train, X_test)
+    model = model.fit(X_train, y_train)
+    y_pred = model.predict_proba(X_test) if len(classes) > 2 else model.predict(X_test)
+    auc_score = metrics.roc_auc_score(y_test, y_pred, multi_class = 'ovr')
+    print ('The accuracy rate is {} by using the {} classifier'.format(np.round(auc_score, 4), model_name))
 
-# Predict and get the prediction score
-pred_prob = clf.predict_proba(X_test)
-auc_score = metrics.roc_auc_score(y_test, pred_prob[:,1])
-print ('The accuracy rate is {} by using the decision tree classifier'.format(np.round(auc_score, 4)))
+    disp = ConfusionMatrixDisplay.from_estimator(
+            model,
+            X_test,
+            y_test,
+            display_labels=classes,
+            cmap=color_map,
+            normalize='true',
+            )
 
-# Random Forest
-rf = RandomForestRegressor(random_state = 42)
-rf.fit(X_train, y_train)
+    class_type = 'Binary' if len(classes) == 2 else 'Multi-Class'
+    title = 'Confusion Matrix for {} Classification ({})'.format(class_type, model_name)
+    disp.ax_.set_title('title', color = '#FEF4E8', y = -0.2)
+    plt.xlabel('Prediction Label', color = '#FEF4E8', fontweight = 'bold')
+    plt.ylabel('True Label', color = '#FEF4E8', fontweight = 'bold')
+    disp.ax_.tick_params(axis = 'x', colors = '#FEF4E8', labelsize = 18)
+    disp.ax_.tick_params(axis = 'y', colors = '#FEF4E8', labelsize = 18)
+    fig = matplotlib.pyplot.gcf()
+    fig.set_size_inches(12, 12)
+    plt.show()
 
-y_pred = rf.predict(X_test)
-auc_score = metrics.roc_auc_score(y_test, y_pred)
-print ('The accuracy rate is {} by using the random forest model'.format(np.round(auc_score, 4)))
+data_fml_bin = data_f.drop(['DELAY_TIME'], axis = 1)
+data_bin = data_fml_bin.values
+X, y = data_bin[:,:-1], data_bin[:,-1]
+model = DecisionTreeClassifier()
+classes = ['No Delay', 'Delay']
+getConfusionMat(model, 'Decision Tree', X, y, classes)
 
-print ('The probability of delay for a random flight is {}'.format(np.round(np.count_nonzero(DELAY == 0) / len(DELAY), 4)))
+data_fml_bin = data_f.drop(['DELAY_TIME'], axis = 1)
+data_bin = data_fml_bin.values
+X, y = data_bin[:,:-1], data_bin[:,-1]
+model = RandomForestClassifier(random_state = 42)
+classes = ['No Delay', 'Delay']
+getConfusionMat(model, 'Random Forest', X, y, classes)
+
+data_fml_mul = data_f.drop(['DELAY'], axis = 1)
+data_mul = data_fml_mul.values
+X, y = data_mul[:,:-1], data_mul[:,-1]
+model = DecisionTreeClassifier(random_state = 100)
+classes = ['No Delay', '0-15', '15-30', '30-45', '45-60', '>60']
+getConfusionMat(model, 'Decision Tree', X, y, classes)
+
+data_fml_mul = data_f.drop(['DELAY'], axis = 1)
+data_mul = data_fml_mul.values
+X, y = data_mul[:,:-1], data_mul[:,-1]
+model = RandomForestClassifier(random_state = 42)
+classes = ['No Delay', '0-15', '15-30', '30-45', '45-60', '>60']
+getConfusionMat(model, 'Random Forest', X, y, classes)
