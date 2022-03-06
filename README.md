@@ -34,7 +34,7 @@ python3 <file.py>
 
 ### Third-Party Modules
 
-All third-party modules can be downloadec through the following methods:
+All third-party modules can be downloaded through the following methods:
 
 [Conda](https://docs.conda.io/en/latest/):
 ```
