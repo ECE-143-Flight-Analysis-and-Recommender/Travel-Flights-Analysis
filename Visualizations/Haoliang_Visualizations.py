@@ -1,11 +1,10 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
-import plotly.graph_objects as go
 import geopandas as gpd
 from shapely.geometry import LineString
-
+import seaborn as sns
+import plotly.graph_objects as go
 
 import os
 
@@ -25,8 +24,9 @@ def delay_by_attribute(attribute, df=flights, figsize=(10, 7)):
     delay_type = lambda x: 0 if x < 10 else 1
     flights['DELAY_TYPE'] = flights['DEPARTURE_DELAY'].apply(delay_type)
 
+
     plt.figure(1, figsize=figsize)
-    ax = sns.countplot(y=attribute, hue='DELAY_TYPE', data=df)
+    ax = sns.countplot(y=attribute, hue='DELAY_TYPE', data=df, palette="Set2")
 
     plt.xlabel('Flight count', fontsize=16, weight='bold')
     plt.ylabel(attribute, fontsize=16, weight='bold')
