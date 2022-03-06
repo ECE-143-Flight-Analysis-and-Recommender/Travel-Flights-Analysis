@@ -19,6 +19,7 @@ Root:
 │    Haoliang_Visualizations.py
 │    Sri_Visualizations.py
 │    Yuqi_Visualizations.py
+│    cmap.dat
 Presentation_Slides.pdf
 Presentation_Visuals.ipynb
 README.md
