@@ -8,10 +8,6 @@ import plotly.graph_objects as go
 
 import os
 
-airports = pd.read_csv('airports.csv')
-flights = pd.read_csv('flights.csv')
-columns_to_drop = ['CANCELLATION_REASON', 'AIR_SYSTEM_DELAY', 'SECURITY_DELAY',
-                  "AIRLINE_DELAY", "LATE_AIRCRAFT_DELAY", "WEATHER_DELAY"]
 flights = flights.drop(columns_to_drop, axis=1, errors='ignore')
 flights = flights[flights['CANCELLED'] == 0]
 flights = flights[flights['DIVERTED'] == 0]
@@ -36,7 +32,6 @@ def delay_by_attribute(attribute, df=flights, figsize=(10, 7)):
     L.get_texts()[1].set_text('large delay (t > 10 min)')
     plt.grid(True)
     plt.show()
-
 delay_by_attribute('AIRLINE')
 result = pd.merge(flights[['ORIGIN_AIRPORT', 'DELAY_TYPE']], airports[['IATA_CODE', 'STATE']], left_on='ORIGIN_AIRPORT', right_on='IATA_CODE')
 
