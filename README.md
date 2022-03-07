@@ -20,9 +20,9 @@ Root:
 │    Sri_Visualizations.py
 │    Yuqi_Visualizations.py
 │    cmap.dat
-Presentation_Slides.pdf
-Presentation_Visuals.ipynb
-README.md
+│Presentation_Slides.pdf
+│Presentation_Visuals.ipynb
+│README.md
 ```
 
 
