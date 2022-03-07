@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib
+from matplotlib import cm
 import matplotlib.pyplot as plt
 from sklearn import metrics, linear_model
 from sklearn.preprocessing import StandardScaler
@@ -14,7 +15,8 @@ from matplotlib.colors import LinearSegmentedColormap
 df = pd.read_csv('flights.csv', low_memory = False)
 df['AIR_ROUTE'] = df['AIRLINE'] + df['FLIGHT_NUMBER'].astype(str)
 df['DATE'] = pd.to_datetime(df[['YEAR', 'MONTH', 'DAY']])
-data = df[0 : 1000000]
+
+data = df[: 1000000]
 data = data.fillna(data.mean(numeric_only=True))
 data_fd = data[data['CANCELLED'] == 0]
 data_fd = data_fd.drop(['CANCELLED'], axis = 1)
@@ -28,7 +30,7 @@ data_fd.loc[:, 'DATE'] = data_fd['DATE'].astype('category').cat.codes
 # NO DELAY : 0
 # DELAY : 1
 DELAY = np.zeros_like(data_fd['ARRIVAL_DELAY'])
-DELAY[data_fd['ARRIVAL_DELAY'] > 0] = 1
+DELAY[np.logical_or(data_fd['ARRIVAL_DELAY'] > 0, data_fd['DEPARTURE_DELAY'] > 0)] = 1
 data_fd.loc[:, 'DELAY'] = DELAY
 
 # # Add DELAY_TIME to dataframe
@@ -46,6 +48,8 @@ DELAY_TIME[np.logical_and(data_fd['ARRIVAL_DELAY'] <= 60, data_fd['ARRIVAL_DELAY
 DELAY_TIME[data_fd['ARRIVAL_DELAY'] > 60] = 5
 data_fd.loc[:, 'DELAY_TIME'] = DELAY_TIME
 
+np.round(np.count_nonzero(DELAY == 1) / len(DELAY), 4)
+
 # Manually drop unrelated features
 drop_col = []
 drop_col += ['TAIL_NUMBER','TAXI_OUT','WHEELS_OFF',\
@@ -56,8 +60,9 @@ drop_col += ['TAIL_NUMBER','TAXI_OUT','WHEELS_OFF',\
              'AIR_SYSTEM_DELAY', 'SECURITY_DELAY', 'AIRLINE_DELAY', 'LATE_AIRCRAFT_DELAY', 'WEATHER_DELAY']
 data_f = data_fd.drop(list(set(drop_col)), axis = 1)
 
-colors = [(135/255, 206/255, 250/255), (1, 160/255, 122/255)]
-color_map = LinearSegmentedColormap.from_list('blue2salmon', colors, N=10)
+# colors = [(135/255, 206/255, 250/255), (1, 160/255, 122/255)]
+# color_map = LinearSegmentedColormap.from_list('blue2salmon', colors, N=10)
+color_map = cm.get_cmap('Oranges')
 font = {'family' : 'DejaVu Sans', 'weight' : 'bold', 'size' : 22}
 plt.rc('font', **font)
 
@@ -125,7 +130,7 @@ def getConfusionMat(model, model_name, X, y, classes):
 
     class_type = 'Binary' if len(classes) == 2 else 'Multi-Class'
     title = 'Confusion Matrix for {} Classification ({})'.format(class_type, model_name)
-    disp.ax_.set_title('title', color = '#FEF4E8', y = -0.2)
+    disp.ax_.set_title(title, color = '#FEF4E8', y = -0.2)
     plt.xlabel('Prediction Label', color = '#FEF4E8', fontweight = 'bold')
     plt.ylabel('True Label', color = '#FEF4E8', fontweight = 'bold')
     disp.ax_.tick_params(axis = 'x', colors = '#FEF4E8', labelsize = 18)
