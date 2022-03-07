@@ -8,6 +8,7 @@ import squarify
 
 from datetime import datetime
 from matplotlib.ticker import PercentFormatter
+from matplotlib.colors import ListedColormap
 
 def prepare_df(fname):
   '''
@@ -198,9 +199,9 @@ def plot_by_state(title, df, airport_fname):
       locations=state_to_counts['State'],
       z = state_to_counts['Density'],
       locationmode = 'USA-states',
-      colorscale = 'OrYel',
+      colorscale = 'YlOrBr',
       marker_line_color='white',
-      colorbar_title = "Delay density (%)"),
+      colorbar_title = "Delay rate"),
     layout= graph.Layout(
         geo_scope='usa',
         title = title,
