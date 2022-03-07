@@ -7,7 +7,24 @@ import pickle
 import plotly.graph_objs as go
 import plotly.express as px
 
-def read_clean_df(flights="flights.csv", airline="airlines.csv", airport="airports.csv"):
+mpl.rcParams['xtick.color'] = '#FEF4E8'
+mpl.rcParams['ytick.color'] = '#FEF4E8'
+mpl.rcParams['axes.labelcolor'] = '#FEF4E8'
+mpl.rcParams['axes.facecolor'] = '#FEF4E8'
+mpl.rcParams['axes.edgecolor'] = '#FEF4E8'
+mpl.rcParams['font.size'] = '18'
+mpl.rcParams['legend.facecolor'] = 'white'
+mpl.rcParams['axes.titlecolor'] = '#FEF4E8'
+
+# sns.set_context("poster")
+
+discrete_cmap = ['#fa8072', '#87cefa', '#f5a700', '#eb471a', '#086569',
+                 '#936400', '#ac9e81', '#d60800', '#13e2ea', '#66c2a5', '#d60800', '#e4bb95', '#d5c4a1', '#c8524e']
+
+with open("cmap.dat", "rb") as f:
+    cmap = pickle.load(f)
+
+def read_clean_df(flights="/content/drive/MyDrive/flights.csv", airline="/content/drive/MyDrive/airlines.csv", airport="/content/drive/MyDrive/airports.csv"):
     """
     Read data from file, clean it by removing invalid rows and add columns('DELAY', 'ARR_DELAY', 'DEP_DELAY')
 
@@ -23,7 +40,7 @@ def read_clean_df(flights="flights.csv", airline="airlines.csv", airport="airpor
     assert isinstance(airline, str)
     assert isinstance(airport, str)
 
-    df = pd.read_csv("flights.csv",
+    df = pd.read_csv("/content/drive/MyDrive/flights.csv",
                      dtype={'ORIGIN_AIRPORT': str, 'DESTINATION_AIRPORT': str})
     df = df.drop(df[df['ORIGIN_AIRPORT'].str.isdigit()].index, axis=0)
     tmp = df[df['CANCELLATION_REASON'].isnull()].iloc[:, 0:24]
@@ -34,9 +51,9 @@ def read_clean_df(flights="flights.csv", airline="airlines.csv", airport="airpor
     df['ARR_DELAY'] = np.where(df['ARRIVAL_DELAY'] > 0, 1, 0)
     df['DEP_DELAY'] = np.where(df['DEPARTURE_DELAY'] > 0, 1, 0)
 
-    df_airline = pd.read_csv("airlines.csv")
+    df_airline = pd.read_csv("/content/drive/MyDrive/airlines.csv")
 
-    df_airport = pd.read_csv("airports.csv")
+    df_airport = pd.read_csv("/content/drive/MyDrive/airports.csv")
     df_airport = df_airport.drop(
         df_airport[df_airport.isnull().any(axis=1)].index, axis=0)
 
@@ -44,6 +61,9 @@ def read_clean_df(flights="flights.csv", airline="airlines.csv", airport="airpor
         df_airline.set_index('IATA_CODE')['AIRLINE'])
 
     return df, df_airline, df_airport
+
+df, df_airline, df_airport = read_clean_df(
+    "flights.csv", "airlines.csv", "airports.csv")
 
 def plot_cancellation_reason(df, xlabel, ylabel, title):
     """
@@ -100,6 +120,11 @@ def plot_cancellation_reason(df, xlabel, ylabel, title):
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
+
+plot_cancellation_reason(
+    df, 'Month', 'Cancellation Rate', 'Reasons for Cancellation')
+
+df = df.drop(df[df['CANCELLED'] == 1].index, axis=0)
 
 def weekday_related_plot1(df, xlabel, ylabel, title):
     """
@@ -172,6 +197,12 @@ def weekday_related_plot2(df_dow, xlabel, ylabel, title):
     ax.set_ylabel(ylabel)
     ax.set_title(title)
 
+df_dow = weekday_related_plot1(
+    df, 'Month', 'Flight Counts', 'Flight Counts vs. Weekdays and Month')
+
+weekday_related_plot2(df_dow, 'Month', 'Delay Rate',
+                      'Delay Rate vs. Weekdays and Month')
+
 def plot_arr_dep_delay(df, xlabel, ylabel, title):
     """
     Average Departure Delay vs. Average Arrival Delay
@@ -214,6 +245,9 @@ def plot_arr_dep_delay(df, xlabel, ylabel, title):
         plt.plot(range(17), range(17), color='#5279a3',
                  linestyle='--', linewidth=2)
 
+plot_arr_dep_delay(df, 'Average Departure Delay', 'Average Arrival Delay',
+                   'Average Departure Delay vs. Average Arrival Delay')
+
 def plot_airline_delay(df, xlabel, ylabel):
     """
     Average Departure Delay vs. Average Arrival Delay
@@ -253,6 +287,8 @@ def plot_airline_delay(df, xlabel, ylabel):
 
     return df
 
+df = plot_airline_delay(df, 'Delay Rate', 'Airline')
+
 def plot_heatmap1(df, xlabel, ylabel, title):
     """
     Delays Rate vs. Airline and Arrival Hour
@@ -280,6 +316,9 @@ def plot_heatmap1(df, xlabel, ylabel, title):
     ax.set_ylabel(ylabel)
     ax.set_title(title)
 
+plot_heatmap1(df, 'Arrival Hour', 'Airline',
+              'Delays Rate vs. Airline and Arrival Hour')
+
 def plot_heatmap2(df, xlabel, ylabel, title):
     """
     Delays Rate vs. Airline and Departute Hour
@@ -306,6 +345,9 @@ def plot_heatmap2(df, xlabel, ylabel, title):
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
+
+plot_heatmap2(df, 'Departute Hour', 'Airline',
+              'Delays Rate vs. Airline and Departute Hour')
 
 def plot_reasons_delay(df, title):
     """
@@ -336,6 +378,8 @@ def plot_reasons_delay(df, title):
 
     plt.title(title)
     plt.setp(pcts, color='#FEF4E8')
+
+plot_reasons_delay(df, "Reasons For Delay")
 
 def get_color(cmap, position):
     """
@@ -435,6 +479,8 @@ def plot_route_airport(df, df_airport, title):
 
     fig.show()
 
+plot_route_airport(df, df_airport, 'Delay Rate of Flights and Airports in US')
+
 def plot_big_small_airport(df, df_airport, xlabel, ylabel, title):
     """
     Big/Small aiports
@@ -470,52 +516,6 @@ def plot_big_small_airport(df, df_airport, xlabel, ylabel, title):
     fig.set_xlabels(xlabel)
     fig.set_ylabels(ylabel)
     fig.set_titles(title)
-
-
-
-mpl.rcParams['xtick.color'] = '#FEF4E8'
-mpl.rcParams['ytick.color'] = '#FEF4E8'
-mpl.rcParams['axes.labelcolor'] = '#FEF4E8'
-mpl.rcParams['axes.facecolor'] = '#FEF4E8'
-mpl.rcParams['axes.edgecolor'] = '#FEF4E8'
-mpl.rcParams['font.size'] = '18'
-mpl.rcParams['legend.facecolor'] = 'white'
-mpl.rcParams['axes.titlecolor'] = '#FEF4E8'
-
-discrete_cmap = ['#fa8072', '#87cefa', '#f5a700', '#eb471a', '#086569',
-                 '#936400', '#ac9e81', '#d60800', '#13e2ea', '#66c2a5', '#d60800', '#e4bb95', '#d5c4a1', '#c8524e']
-
-with open("cmap.dat", "rb") as f:
-    cmap = pickle.load(f)
-
-df, df_airline, df_airport = read_clean_df(
-    "flights.csv", "airlines.csv", "airports.csv")
-
-plot_cancellation_reason(
-    df, 'Month', 'Cancellation Rate', 'Reasons for Cancellation')
-
-df = df.drop(df[df['CANCELLED'] == 1].index, axis=0)
-
-df_dow = weekday_related_plot1(
-    df, 'Month', 'Flight Counts', 'Flight Counts vs. Weekdays and Month')
-
-weekday_related_plot2(df_dow, 'Month', 'Delay Rate',
-                      'Delay Rate vs. Weekdays and Month')
-
-plot_arr_dep_delay(df, 'Average Departure Delay', 'Average Arrival Delay',
-                   'Average Departure Delay vs. Average Arrival Delay')
-
-df = plot_airline_delay(df, 'Delay Rate', 'Airline')
-
-plot_heatmap1(df, 'Arrival Hour', 'Airline',
-              'Delays Rate vs. Airline and Arrival Hour')
-
-plot_heatmap2(df, 'Departute Hour', 'Airline',
-              'Delays Rate vs. Airline and Departute Hour')
-
-plot_reasons_delay(df, "Reasons For Delay")
-
-plot_route_airport(df, df_airport, 'Delay Rate of Flights and Airports in US')
 
 plot_big_small_airport(df, df_airport, "Flight Counts",
                        "Delay Rate", "Big/Small aiports")
