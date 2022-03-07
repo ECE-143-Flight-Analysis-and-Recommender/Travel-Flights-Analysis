@@ -59,7 +59,7 @@ brew install <third-party module>
 * **[Plotly](https://plotly.com/)**
 * **[Geopandas](https://geopandas.org/en/stable/)**
 * **[Sklearn](https://scikit-learn.org/stable/)**
-* **[Sqarify](https://github.com/laserson/squarify)**
+* **[Squarify](https://github.com/laserson/squarify)**
 * **[Calmap]()**
 
 ## Authors
