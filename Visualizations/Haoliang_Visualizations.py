@@ -8,6 +8,10 @@ import plotly.graph_objects as go
 
 import os
 
+airports = pd.read_csv('airports.csv')
+flights = pd.read_csv('flights.csv')
+columns_to_drop = ['CANCELLATION_REASON', 'AIR_SYSTEM_DELAY', 'SECURITY_DELAY',
+                  "AIRLINE_DELAY", "LATE_AIRCRAFT_DELAY", "WEATHER_DELAY"]
 flights = flights.drop(columns_to_drop, axis=1, errors='ignore')
 flights = flights[flights['CANCELLED'] == 0]
 flights = flights[flights['DIVERTED'] == 0]
