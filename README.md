@@ -60,7 +60,7 @@ brew install <third-party module>
 * **[Geopandas](https://geopandas.org/en/stable/)**
 * **[Sklearn](https://scikit-learn.org/stable/)**
 * **[Sqarify](https://github.com/laserson/squarify)**
-* **[Calamp]()**
+* **[Calmap]()**
 
 ## Authors
 
